@@ -42,10 +42,10 @@ def follow_up_response(user_input, context, pattern, info):
     print(f"Follow-up context: {context}, info: {info}")  # Debugging info
     if "yes" in user_input.lower():
         if context == "date":
-            response = f"Great! The definition is: {info['definition']}<br>Pick another holiday or tell me which holiday you want to know.<br>Type 'bye' to exit."
+            response = f"Great! {info['definition']}<br>Pick another holiday or tell me which holiday you want to know."
         elif context == "definition":
             date_response = random.choice(info['date'])
-            response = f"Great! The date is: {date_response}<br>Pick another holiday or tell me which holiday you want to know.<br>Type 'bye' to exit."
+            response = f"Great! {date_response}<br>Pick another holiday or tell me which holiday you want to know."
         
         # Reset context and pattern to allow new input
         context = None
@@ -55,7 +55,7 @@ def follow_up_response(user_input, context, pattern, info):
         return response, context, pattern, info  # Return updated values
 
     elif "no" in user_input.lower():
-        return "Okay! Pick another holiday or tell me which holiday you want to know. <br> Type 'bye' to exit.", context, pattern, info  # Maintain state
+        return "Okay! Pick another holiday or tell me which holiday you want to know.", context, pattern, info  # Maintain state
     return "I'm sorry, I didn't understand that. Please answer with yes or no.", context, pattern, info  # Maintain state
 
 @app.route("/")
