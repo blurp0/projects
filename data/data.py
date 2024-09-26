@@ -1,15 +1,13 @@
 # data for chatbot
 
 greetings = [
-    {"pattern": "hi", "response": "Hi there! I'm Holly Germ, your holiday expert! How can I assist you today? 😊"},
-    {"pattern": "hello", "response": "Hello! How can I help you with Philippine holidays today? 🌞"},
-    {"pattern": "hey", "response": "Hey! Ready to dive into some holiday knowledge? 🏝️"},
-    {"pattern": "how are you", "response": "I'm doing great, thanks for asking! How about you? 😊"},
-    {"pattern": "good morning", "response": "Good morning! How can I assist you today? ☀️"},
-    {"pattern": "good afternoon", "response": "Good afternoon! What can I help you with today? 🌅"},
-    {"pattern": "good evening", "response": "Good evening! Any holiday-related questions I can answer for you tonight? 🌙"},
+    {"pattern": r"hey|hi|hello", "response": "Hi there! I'm Holly Germ, your holiday expert! What's your name? 😊"},
+    {"pattern": r"how are you", "response": "I'm doing great, thanks for asking! And you? 😊"},
+    {"pattern": r"(.*)morning|(.*)afternoon|(.*)evening", "response": "Thank you, How can I assist you today? 😊"},
+    {"pattern": r"what is your name|tell me your name|who are you", "response": "I'm Holly Germ, your friendly holiday expert! How can I assist you today? 😊"},
+    {"pattern": r"what do you do|what's your purpose", "response": "I provide information about Philippine holidays! Feel free to ask me anything! 🎉"},
+    {"pattern": r"tell me about yourself|describe yourself", "response": "I'm Holly Germ, passionate about Philippine holidays. What's your favorite holiday? 🌟"},
 ]
-
 
 
 data = {
