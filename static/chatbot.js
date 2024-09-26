@@ -1,3 +1,5 @@
+//chatbot.js
+
 $(document).ready(function() {
     const msgerForm = $("#chatForm");
     const msgerInput = $("#textInput");
@@ -5,7 +7,7 @@ $(document).ready(function() {
 
     const BOT_IMG = "https://image.flaticon.com/icons/svg/327/327779.svg";
     const PERSON_IMG = "https://image.flaticon.com/icons/svg/145/145867.svg";
-    const BOT_NAME = "ChatBot";
+    const BOT_NAME = "Holly Germ";
     const PERSON_NAME = "You";
 
     let context = null;
@@ -45,31 +47,38 @@ $(document).ready(function() {
         console.log("Context:", context);
         console.log("Info:", info);
         console.log("Pattern:", pattern);
-
+        
+    
         $.ajax({
             type: "POST",
             url: "/chat",
             data: { 
                 msg: rawText, 
                 context: context, 
-                info: JSON.stringify(info),  // Ensure it's serialized here too
+                info: JSON.stringify(info), 
                 pattern: pattern 
             },
             success: function(data) {
                 appendMessage(BOT_NAME, BOT_IMG, "left", data.response);
+                
+                // Check if the response indicates a goodbye
+                if (data.response.includes("Goodbye")) {
+                    closeChat(); // Call the function to close the chat
+                }
+
                 context = data.context;  // Update the context
                 info = data.info;        // Update the info
                 pattern = data.pattern;   // Update the pattern
-
+    
                 console.log("Received data from server:");
                 console.log("Response:", data.response);
                 console.log("New Context:", context);
                 console.log("New Info:", info);
                 console.log("New Pattern:", pattern);
-
+    
                 // Update hidden inputs if they're present
                 $('#context').val(context);
-                $('#info').val(JSON.stringify(info)); // Use JSON.stringify if it's an object
+                $('#info').val(JSON.stringify(info));
                 $('#pattern').val(pattern);
             },
             error: function() {
@@ -82,5 +91,11 @@ $(document).ready(function() {
         const h = "0" + date.getHours();
         const m = "0" + date.getMinutes();
         return `${h.slice(-2)}:${m.slice(-2)}`;
+    }
+
+    // Function to close the chat interface
+    function closeChat() {
+        document.getElementById("chatContainer").style.display = "none"; // Hides the chat interface
+        alert("Chat closed. Have a great day!"); // Optional alert to notify the user
     }
 });

@@ -1,8 +1,10 @@
+# app.py (chatbot main python file)
+import re
 from flask import Flask, render_template, request, jsonify
 import nltk
 from nltk.stem import PorterStemmer
 import random
-from data.data import data  # Ensure that 'data' contains your patterns and definitions
+from data.data import data, greetings  # Import greetings patterns from data
 import json
 
 app = Flask(__name__)
@@ -15,48 +17,57 @@ def preprocess(sentence):
     return [stemmer.stem(token) for token in tokens]
 
 def get_response(user_input):
+    print("Handling new input")
     print("User input:", user_input)
-    # Check if the input matches any holiday pattern
+
+    # Check for goodbye inputs
+    if re.search(r"\b(bye|goodbye)\b", user_input.lower()):
+        print("Goodbye pattern matched!")
+        return "Goodbye! Have a great day! 👋", "goodbye", None, {}
+
+    # Check for greetings first using imported patterns
+    for item in greetings:
+        pattern = item["pattern"]
+        if re.search(pattern, user_input.lower()):
+            print("Greeting pattern matched!")
+            return item["response"], "greeting", None, {}
+
+    # If no greetings matched, check holiday patterns
     for pattern, info in data.items():
         print("Checking pattern:", pattern)
-        if nltk.re.match(pattern, user_input.lower()):
+        if re.match(pattern, user_input.lower()):
             print("Pattern matched!")
-            # Only set 'name' if it hasn't been set (to avoid overwriting during follow-ups)
-            if 'name' not in info:
-                info['name'] = user_input.split()[-2] + " " + user_input.split()[-1]
-
-            # Return the definition or date as needed
             if "what" in user_input.lower():
-                return (f"{info['definition']}<br>Would you like to know the date? (yes/no)", "definition", pattern, info)
+                return f"{info['definition']}<br>Would you like to know the date? (yes/no)", "definition", pattern, info
             elif "when" in user_input.lower():
-                date_response = random.choice(info['date'])
-                return (f"{date_response}<br>Would you like to know the definition? (yes/no)", "date", pattern, info)
-            else:
-                return ("I'm sorry, I didn't understand that. Please ask what or when.", None, None, {})
+                date_response = random.choice(info['date']) if info['date'] else "I don't have the date for that."
+                return f"{date_response}<br>Would you like to know the definition? (yes/no)", "date", pattern, info
 
+    # Default response if no patterns matched
     print("No pattern matched. Returning default response.")
-    return ("I'm sorry, I didn't understand that. Please ask about a holiday.", None, None, {})
-
+    return "I'm sorry, I didn't understand that. Please ask about a holiday.", None, None, {}
 
 def follow_up_response(user_input, context, pattern, info):
-    print(f"Follow-up context: {context}, info: {info}")  # Debugging info
+    print(f"Follow-up context: {context}, info: {info}")
     if "yes" in user_input.lower():
         if context == "date":
-            response = f"Great! {info['definition']}<br>Pick another holiday or tell me which holiday you want to know."
+            response = f"Glad you're interested! Here's more about it: {info['definition']}<br>Feel free to ask about another holiday!"
         elif context == "definition":
             date_response = random.choice(info['date'])
-            response = f"Great! {date_response}<br>Pick another holiday or tell me which holiday you want to know."
-        
-        # Reset context and pattern to allow new input
+            response = f"Got it! {date_response}.<br>Anything else you’re curious about?"
+
+        # Reset context
         context = None
         pattern = None
         info = {}
-        
-        return response, context, pattern, info  # Return updated values
 
+        return response, context, pattern, info
+    
     elif "no" in user_input.lower():
-        return "Okay! Pick another holiday or tell me which holiday you want to know.", context, pattern, info  # Maintain state
-    return "I'm sorry, I didn't understand that. Please answer with yes or no.", context, pattern, info  # Maintain state
+        return "Okay, no problem! Let me know if you'd like to hear about another holiday.", context, pattern, info
+    
+    return "Hmm, I didn’t quite get that. Can you answer with yes or no?", context, pattern, info
+
 
 @app.route("/")
 def index():
@@ -102,7 +113,6 @@ def process_user_input(user_input, context, info, pattern):
     info = new_info
 
     return response, context, pattern, info  # Return all values
-
 
 if __name__ == "__main__":
     app.run(debug=True)
