@@ -1,11 +1,12 @@
 # app.py (chatbot main python file)
 import re
+import json
+import random
 from flask import Flask, render_template, request, jsonify
 import nltk
 from nltk.stem import PorterStemmer
-import random
-from data.data import data, greetings  # Import greetings patterns from data
-import json
+from data.data import data, greetings
+
 
 app = Flask(__name__)
 
